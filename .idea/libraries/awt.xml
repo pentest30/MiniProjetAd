@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="awt">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Desktop/TPAlgDist01/awt.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/TPAlgDist01/daj.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
