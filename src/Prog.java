@@ -123,7 +123,7 @@ public class Prog extends Program {
                 master.message = null;
                 master.message=(Msg)master.in(channel).receive();
 
-                if (master.message!=null) System.out.println(master.message.getValue());
+                if (master.message!=null) System.out.println(master.message.getValue() +" "+ master.message.typeResource +" "+ master.message.TimeSpan);
                 if (master.message.getValue()!="demande ressource") continue;
                 List<Ressource> remainResources = new LinkedList<>();
                 for (Ressource resr:master.ressources) {
@@ -161,9 +161,22 @@ public class Prog extends Program {
                 }
                 // where the ressources are available
                 else {
-                    int count  = master.ressources.stream().filter(x->!x.Occupied).collect(Collectors.toList()).size();
-                    Ressource comming = initRessource(master.ressources.size()- count  ,master.message.NbPorte, master.message.TimeSpan , Instant.now(), master.message.typeResource );
-                    master.ressources.add(comming);
+                     List<Ressource> tmp  = master.ressources.stream().filter(x->!x.Occupied &&x.type ==master.message.typeResource ).collect(Collectors.toList());
+                     int id = tmp.get(0).Id();
+                    for (Ressource comming:master.ressources) {
+                        if (comming.id ==id){
+                            //update the state of the ressource that will be used
+                            comming.Occupied = true;
+                            comming.Start = Instant.now();
+                            comming.TimeSpan = master.message.TimeSpan;
+                            comming.NodeId = master.message.NbPorte;
+                            System.out.println("la demande avec ID "  + comming.Id() + "est en phase d'exec pendant " + comming.TimeSpan);
+                            break;
+
+                        }
+
+
+                    }
 
                 }
 
@@ -282,8 +295,9 @@ public class Prog extends Program {
                 }
                 //
                 if (AnnyOk ==false ||p0.reponsesElections.size()==0) {
-                    //envoyer le resultat d'éléction aux autres processs
-                    p0.message =  new Msg("I am the condidator! " +p0.index  , p0.index);
+
+                    // le leader envoi le resultat d'éléction aux autres processs
+                    p0.message =  new Msg("I am the leader ! " +p0.index  , p0.index);
                     System.out.println(p0.message.getValue());
                     p0.out().send(p0.message);
                     p0.isMaster = true;
@@ -321,13 +335,15 @@ public class Prog extends Program {
 
     private void addRessources() {
         Random r = new Random();
+        int s =0;
         for (TypeResource rs:TypeResource.values()) {
-            for(int k =1; k<r.nextInt(5) ; k++){
+            for(int k =s; k<r.nextInt(5 ) ; k++){
                 Ressource r1  = new Ressource();
-                r1.id = k;
-                r1.name= "Ressource N° " + k;
+                r1.id = s;
+                r1.name= "Ressource N° " + s;
                 r1.type = rs;
                 Main.ressources.add(r1);
+                s++;
 
             }    //To change body of gener
         }
