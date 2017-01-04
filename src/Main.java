@@ -22,8 +22,7 @@ public class Main extends Application
         new Main().run();
        // RunBullySelection(progs.get(0));
     }
-         public Main()
-    {
+         public Main() {
         super("Mini projet", 1000, 1600);
         // ListeOfNodes =
     }
