@@ -127,14 +127,17 @@ public class Prog extends Program {
                 if (master.message.getValue()!="demande ressource") continue;
                 List<Ressource> remainResources = new LinkedList<>();
                 for (Ressource resr:master.ressources) {
-                    if (resr.type== master.message.typeResource) remainResources.add(resr);
+                    if (resr.type== master.message.typeResource&& resr.Occupied==false) remainResources.add(resr);
 
                 }
                 //Wound-wait algo
                 // the principe of the algo https://sites.google.com/site/projectcodebank/computer-engineering-notes/concurrency-control/6-wait-die-and-wound-wait-schemes
                 if (remainResources.size() ==0) {
                     List<Ressource> listOfWoundedProcess = master.ressources.stream()
-                            .filter(x->(x.TimeSpan)>master.message.TimeSpan&& x.Start.isBefore( Instant.now()))
+                            .filter(x->(x.TimeSpan)>master.message.TimeSpan&&
+                                    x.Start.isBefore( Instant.now()) &&
+                                    x.type ==master.message.typeResource&&
+                                    x.Occupied)
                             .sorted()
                             .collect(Collectors.toList());
 
@@ -170,7 +173,7 @@ public class Prog extends Program {
                             comming.Start = Instant.now();
                             comming.TimeSpan = master.message.TimeSpan;
                             comming.NodeId = master.message.NbPorte;
-                            System.out.println("la demande avec ID "  + comming.Id() + "est en phase d'exec pendant " + comming.TimeSpan);
+                            System.out.println("la demande avec ID "  + comming.Id() + " est en phase d'exec pendant " + comming.TimeSpan);
                             break;
 
                         }
