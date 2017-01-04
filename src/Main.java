@@ -15,7 +15,7 @@ public class Main extends Application
     public static void main(String[] args) throws InterruptedException {
 
 
-
+ressources = new LinkedList<>();
         // TODO code application logic here
         new Main().run();
        // RunBullySelection(progs.get(0));
