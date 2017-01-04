@@ -147,7 +147,7 @@ public class Prog extends Program {
                         master.ressources.add(comming);
 
                     }
-                    //the comming demande has to wait
+                    //the comming demande have to wait
                     else {
                         Ressource comming = initRessource( -1 ,master.message.NbPorte, master.message.TimeSpan , Instant.now() );
                         master.queue.add(comming);
