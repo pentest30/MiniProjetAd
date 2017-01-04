@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class Prog extends Program {
     int index;
     List<Neighbor> neighbors;
-    List<Response> reponsesSelections;
+    List<Response> reponsesElections;
     List<Ressource> ressources;
     List<Ressource> queue;
     Msg message;
@@ -24,7 +24,7 @@ public class Prog extends Program {
     public Prog(int k) {
         index = k;
         neighbors =  new LinkedList<>();
-        reponsesSelections = new LinkedList<>();
+        reponsesElections = new LinkedList<>();
         ressources = new LinkedList<>();
         addRessources();
         AddNeighbors(k);
@@ -99,7 +99,7 @@ public class Prog extends Program {
         for (TypeResource rs:TypeResource.values()) {
             if (chance==0) break;
             chance --;
-            int periode = rand.nextInt(20000);
+            int periode = rand.nextInt(20);
             // le msg contient une demande de ressource il contient le processus id le temp , etle type de ressource
             init.message =  new Msg ("demande ressource" , init.index,1 ,periode , rs );
             int channel= -1;
@@ -129,6 +129,7 @@ public class Prog extends Program {
 
                 }
                 //Wound-wait algo
+                // the principe of the algo https://sites.google.com/site/projectcodebank/computer-engineering-notes/concurrency-control/6-wait-die-and-wound-wait-schemes
                 if (remainResources.size() ==0) {
                     List<Ressource> listOfWoundedProcess = master.ressources.stream()
                             .filter(x->(x.TimeSpan)>master.message.TimeSpan&& x.Start.isBefore( Instant.now()))
@@ -143,13 +144,13 @@ public class Prog extends Program {
                         //add  the rolled back proc to the queue
                         master.queue.add(woundedRs);
                         master.ressources.remove(woundedRs);
-                        Ressource comming = initRessource( woundedRs.id ,master.message.NbPorte, master.message.TimeSpan , Instant.now() );
+                        Ressource comming = initRessource( woundedRs.id ,master.message.NbPorte, master.message.TimeSpan , Instant.now(),  message.typeResource );
                         master.ressources.add(comming);
 
                     }
                     //the comming demande have to wait
                     else {
-                        Ressource comming = initRessource( -1 ,master.message.NbPorte, master.message.TimeSpan , Instant.now() );
+                        Ressource comming = initRessource( -1 ,master.message.NbPorte, master.message.TimeSpan , Instant.now() , message.typeResource);
                         master.queue.add(comming);
 
                     }
@@ -159,7 +160,7 @@ public class Prog extends Program {
                 // where the ressources are available
                 else {
                     int count  = master.ressources.stream().filter(x->!x.Occupied).collect(Collectors.toList()).size();
-                    Ressource comming = initRessource(master.ressources.size()- count  ,master.message.NbPorte, master.message.TimeSpan , Instant.now() );
+                    Ressource comming = initRessource(master.ressources.size()- count  ,master.message.NbPorte, master.message.TimeSpan , Instant.now(), master.message.typeResource );
                     master.ressources.add(comming);
 
                 }
@@ -170,10 +171,20 @@ public class Prog extends Program {
         }
 
     }
-    private Ressource initRessource (int id , int procId , int timeSpan ,Instant instat ){
-        return  new Ressource();
+    private Ressource initRessource (int id , int procId , int timeSpan ,Instant instat , TypeResource type ){
+        Ressource r1 = new Ressource();
+        r1.id = id;
+        r1.name= "Ressource N° " + id;
+        r1.type = type;
+        r1.Start = instat;
+        r1.TimeSpan = timeSpan;
+        r1.NodeId = procId;
+        r1.Occupied =true;
+        //Main.ressources.add(r1);
+        return  r1;
 
     }
+     // reference http://www.cs.colostate.edu/~cs551/CourseNotes/Synchronization/BullyExample.html
     void  RunBullyElection(Prog p0 ) throws InterruptedException {
 
         //Main.progs.get(5).enPanne = true;
@@ -251,7 +262,7 @@ public class Prog extends Program {
                                     Response r = new Response();
                                     r.Response = p0.message.getValue();
                                     r.Node = x;
-                                    p0.reponsesSelections.add(r);
+                                    p0.reponsesElections.add(r);
                                 }
                             }
 
@@ -263,12 +274,12 @@ public class Prog extends Program {
 
 
                 }
-                for (Response res: p0.reponsesSelections) {
+                for (Response res: p0.reponsesElections) {
                     if (res.Response=="Ok") { AnnyOk= true; break;}
 
                 }
                 //
-                if (AnnyOk ==false ||p0.reponsesSelections.size()==0) {
+                if (AnnyOk ==false ||p0.reponsesElections.size()==0) {
                     //envoyer le resultat d'éléction aux autres processs
                     p0.message =  new Msg("I am the condidator! " +p0.index  , p0.index);
                     System.out.println(p0.message.getValue());
