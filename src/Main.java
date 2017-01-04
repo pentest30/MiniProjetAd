@@ -12,6 +12,7 @@ public class Main extends Application
 
     public static List<Prog> progs;
     public static List<Ressource> ressources;
+    public static List<Ressource> queue;
     public static void main(String[] args) throws InterruptedException {
 
 

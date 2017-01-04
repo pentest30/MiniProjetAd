@@ -290,6 +290,7 @@ public class Prog extends Program {
                     });
                     p0.ressources=Main.ressources;
                     p0.queue = new LinkedList<>();
+                    if (Main.queue.size()!=0) p0.queue = Main.queue;
                     p0.yield();
                     for(Prog node: Main.progs){
                         if (node!= p0){
