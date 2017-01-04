@@ -46,6 +46,7 @@ public class Prog extends Program {
             n.channel =i-1;
             n.node =i;
             neighbors.add(n);
+            //
 
         }
     }
