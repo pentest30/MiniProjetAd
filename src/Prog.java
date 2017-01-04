@@ -114,7 +114,7 @@ public class Prog extends Program {
             }
             if (channel>-1)init.out(channel).send(init.message);
             Prog master = Main.progs.get(masterId);
-            if (master!= null){
+            if (master!= null ){
                 for (Neighbor n: master.neighbors)
                     if (n.node==init.index) {
                         channel = n.channel; break;
@@ -122,7 +122,9 @@ public class Prog extends Program {
                     }
                 master.message = null;
                 master.message=(Msg)master.in(channel).receive();
+
                 if (master.message!=null) System.out.println(master.message.getValue());
+                if (master.message.getValue()!="demande ressource") continue;
                 List<Ressource> remainResources = new LinkedList<>();
                 for (Ressource resr:master.ressources) {
                     if (resr.type== master.message.typeResource) remainResources.add(resr);
