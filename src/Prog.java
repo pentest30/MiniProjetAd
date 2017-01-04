@@ -60,11 +60,12 @@ public class Prog extends Program {
 
 
                     RunBullyElection(this);
-                    Random r = new Random();
+
                     while (true) {
                    /*  try {
                          Main.progs.stream().filter(x->!x.isMaster).parallel().forEach(e-> e.GenerateDemande(e));
                      }catch (Exception ex) {continue;}*/
+                        Random r = new Random();
                         Prog p = Main.progs.get(r.nextInt(Main.progs.size()));
                         this.yield();
 
@@ -146,9 +147,20 @@ public class Prog extends Program {
                         master.ressources.add(comming);
 
                     }
+                    //the comming demande has to wait
+                    else {
+                        Ressource comming = initRessource( -1 ,master.message.NbPorte, master.message.TimeSpan , Instant.now() );
+                        master.queue.add(comming);
+
+                    }
 
 
-                }else {
+                }
+                // where the ressources are available
+                else {
+                    int count  = master.ressources.stream().filter(x->!x.Occupied).collect(Collectors.toList()).size();
+                    Ressource comming = initRessource(master.ressources.size()- count  ,master.message.NbPorte, master.message.TimeSpan , Instant.now() );
+                    master.ressources.add(comming);
 
                 }
 
